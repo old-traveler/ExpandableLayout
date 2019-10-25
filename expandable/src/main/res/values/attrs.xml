@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+  <declare-styleable name="ExpandableLayout">
+    <attr name="collapseHeight" format="dimension" />
+    <attr name="hasAnimation" format="boolean" />
+    <attr name="animationDuration" format="integer" />
+    <attr name="enableCollapseAfterExpand" format="boolean" />
+    <attr name="expendableTriggerId" format="reference" />
+  </declare-styleable>
+
+  <declare-styleable name="SimpleTriggerView">
+    <attr name="textSize" format="dimension" />
+    <attr name="textColor" format="color" />
+    <attr name="icon" format="reference" />
+    <attr name="expandText" format="string" />
+    <attr name="collapseText" format="string" />
+    <attr name="iconColor" format="color" />
+    <attr name="iconSize" format="dimension" />
+    <attr name="enableBaseLine" format="boolean" />
+  </declare-styleable>
+
+</resources>
