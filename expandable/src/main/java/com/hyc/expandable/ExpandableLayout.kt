@@ -113,9 +113,8 @@ class ExpandableLayout @JvmOverloads constructor(
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     this.ensureTarget()
-    this.mTargetView.measure(widthMeasureSpec, heightMeasureSpec)
     if (!isAnimation) {
-      expandHeight = this.mTargetView.measuredHeight.toFloat()
+      expandHeight = getTargetViewExpandHeight(widthMeasureSpec, heightMeasureSpec)
       (this.mTargetView.layoutParams as? LayoutParams?).let {
         it?.height = when (mCurState) {
           STATE_COLLAPSE -> collapseHeight.toInt().coerceAtMost(expandHeight.toInt())
@@ -127,11 +126,18 @@ class ExpandableLayout @JvmOverloads constructor(
         this.mTriggerView?.visibility = View.GONE
         isEnabled = false
       } else if (enableCollapseAfterExpand) {
+        isEnabled = true
         this.mTriggerView?.visibility = View.VISIBLE
       }
     }
     super.onMeasure(widthMeasureSpec, heightMeasureSpec)
   }
+
+  private fun getTargetViewExpandHeight(widthMeasureSpec: Int, heightMeasureSpec: Int): Float {
+    this.mTargetView.measure(widthMeasureSpec, heightMeasureSpec)
+    return this.mTargetView.measuredHeight.toFloat()
+  }
+
 
   private fun ensureTarget() {
     mTargetView = getChildAt(0)

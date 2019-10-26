@@ -18,6 +18,11 @@
     <attr name="iconColor" format="color" />
     <attr name="iconSize" format="dimension" />
     <attr name="enableBaseLine" format="boolean" />
+    <attr name="textStyle">
+      <flag name="normal" value="0" />
+      <flag name="bold" value="1" />
+      <flag name="italic" value="2" />
+    </attr>
   </declare-styleable>
 
 </resources>

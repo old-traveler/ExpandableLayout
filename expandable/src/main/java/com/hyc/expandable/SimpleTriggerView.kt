@@ -3,6 +3,7 @@ package com.hyc.expandable
 import android.content.Context
 import android.graphics.Color
 import android.graphics.Rect
+import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.util.AttributeSet
@@ -39,7 +40,6 @@ class SimpleTriggerView @JvmOverloads constructor(
   private val tvTitle: TextView
   private val ivIcon: ImageView
   private val expandAnimationChangeImp: SimpleExpandAnimationChangeImp
-  private var expandableLayout: ExpandableLayout? = null
 
   init {
     val typeArray = context.obtainStyledAttributes(attrs, R.styleable.SimpleTriggerView)
@@ -56,10 +56,15 @@ class SimpleTriggerView @JvmOverloads constructor(
       DrawableCompat.setTint(drawable, iconColor)
     }
     enableBaseLine = typeArray.getBoolean(R.styleable.SimpleTriggerView_enableBaseLine, false)
+    val textStyle = typeArray.getInt(R.styleable.SimpleTriggerView_textStyle, Typeface.NORMAL)
     typeArray.recycle()
 
     tvTitle = TextView(context)
     tvTitle.setTextColor(textColor)
+    tvTitle.setTypeface(
+      null,
+      textStyle
+    )
     ivIcon = ImageView(context)
     addView(tvTitle)
     addView(ivIcon)
@@ -76,8 +81,7 @@ class SimpleTriggerView @JvmOverloads constructor(
       it.width = iconSize.toInt()
       it.height = iconSize.toInt()
     }
-    tvTitle.setOnClickListener(this)
-    ivIcon.setOnClickListener(this)
+
   }
 
   private fun getDrawable(context: Context, @DrawableRes resId: Int): Drawable {
@@ -109,6 +113,11 @@ class SimpleTriggerView @JvmOverloads constructor(
     } else if (state == ExpandableLayout.STATE_EXPAND) {
       tvTitle.text = expandText
     }
+    if (state == ExpandableLayout.STATE_EXPAND) {
+      ivIcon.rotation = 180F
+    } else {
+      ivIcon.rotation = 0F
+    }
     initLayout()
   }
 
@@ -132,12 +141,13 @@ class SimpleTriggerView @JvmOverloads constructor(
     super.onAttachedToWindow()
     if (parent is ExpandableLayout) {
       (parent as ExpandableLayout).apply {
-        expandableLayout = this
         initState(this.getExpandState())
         this.addExpandStateChangeListener(this@SimpleTriggerView)
         this.addExpandAnimationChangeListener(expandAnimationChangeImp)
       }
     }
+    tvTitle.setOnClickListener(this)
+    ivIcon.setOnClickListener(this)
   }
 
   override fun onDetachedFromWindow() {
@@ -148,6 +158,9 @@ class SimpleTriggerView @JvmOverloads constructor(
         this.removeExpandStateChangeListener(this@SimpleTriggerView)
       }
     }
+    tvTitle.setOnClickListener(null)
+    ivIcon.setOnClickListener(null)
+
   }
 
   override fun onExpandStateChange(layout: ExpandableLayout, oldState: Int, newState: Int) {
@@ -162,13 +175,15 @@ class SimpleTriggerView @JvmOverloads constructor(
   }
 
   override fun onClick(v: View?) {
-    expandableLayout?.setExpandState(
-      if (expandableLayout?.getExpandState() == ExpandableLayout.STATE_COLLAPSE) {
-        ExpandableLayout.STATE_EXPAND
-      } else {
-        ExpandableLayout.STATE_COLLAPSE
-      }
-    )
+    (parent as? ExpandableLayout?)?.let {
+      it.setExpandState(
+        if (it.getExpandState() == ExpandableLayout.STATE_COLLAPSE) {
+          ExpandableLayout.STATE_EXPAND
+        } else {
+          ExpandableLayout.STATE_COLLAPSE
+        }
+      )
+    }
   }
 
 }
