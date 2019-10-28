@@ -46,6 +46,7 @@ class ExpandableLayout @JvmOverloads constructor(
         isAnimation = true
         startAnimation()
       } else {
+        this.ensureTarget()
         this.mTargetView.requestLayout()
         enableCollapseAfterExpand()
       }
