@@ -134,10 +134,12 @@ class ExpandableLayout @JvmOverloads constructor(
   }
 
   private fun getTargetViewExpandHeight(widthMeasureSpec: Int, heightMeasureSpec: Int): Float {
-    this.mTargetView.measure(widthMeasureSpec, heightMeasureSpec)
+    val layout = this.mTargetView.layoutParams as LayoutParams
+    layout.height = android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+    this.mTargetView.layoutParams = layout
+    measureChildWithMargins(this.mTargetView, widthMeasureSpec, 0, heightMeasureSpec, 0)
     return this.mTargetView.measuredHeight.toFloat()
   }
-
 
   private fun ensureTarget() {
     mTargetView = getChildAt(0)
