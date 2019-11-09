@@ -7,10 +7,12 @@ import android.util.AttributeSet
 import android.util.SparseIntArray
 import android.view.View
 import android.view.View.OnClickListener
+import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.Animation.AnimationListener
 import android.view.animation.Transformation
 import android.widget.LinearLayout
+import android.widget.TextView
 import com.hyc.expandable.R.styleable
 import kotlin.properties.Delegates
 import kotlin.reflect.KProperty
@@ -202,6 +204,14 @@ class ExpandableLayout @JvmOverloads constructor(
           STATE_COLLAPSE
         }
       )
+    }
+  }
+
+  override fun onDetachedFromWindow() {
+    super.onDetachedFromWindow()
+    this.ensureTarget()
+    if (mTargetView is TextView){
+      mTargetView.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
     }
   }
 
