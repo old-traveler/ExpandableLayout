@@ -37,9 +37,10 @@ class ExpandableLayout @JvmOverloads constructor(
   private var sparseArray: SparseIntArray? = null
   private var position: Int = 0
   private var enableCollapseAfterExpand: Boolean = true
+  private var maxLine = 0
   var mTriggerId: Int = -1
   private var mCurState: Int by Delegates.observable(STATE_COLLAPSE) { _: KProperty<*>, oldValue: Int, newValue: Int ->
-    if (oldValue != newValue && isEnabled) {
+    if (mTriggerView?.visibility == View.VISIBLE && isEnabled) {
       onExpandStateChangeListeners.forEach {
         it?.onExpandStateChange(this, oldValue, newValue)
       }
@@ -77,7 +78,6 @@ class ExpandableLayout @JvmOverloads constructor(
   private fun enableCollapseAfterExpand() {
     if (mCurState == STATE_EXPAND && !enableCollapseAfterExpand && mTriggerView?.visibility == View.VISIBLE) {
       mTriggerView?.visibility = View.GONE
-      isEnabled = false
     }
   }
 
@@ -111,6 +111,7 @@ class ExpandableLayout @JvmOverloads constructor(
     enableCollapseAfterExpand =
       typedArray.getBoolean(styleable.ExpandableLayout_enableCollapseAfterExpand, true)
     mTriggerId = typedArray.getResourceId(styleable.ExpandableLayout_expendableTriggerId, -1)
+    maxLine = typedArray.getInt(styleable.ExpandableLayout_maxLine, 0)
     typedArray.recycle()
   }
 
@@ -120,28 +121,37 @@ class ExpandableLayout @JvmOverloads constructor(
       expandHeight = getTargetViewExpandHeight(widthMeasureSpec, heightMeasureSpec)
       (this.mTargetView.layoutParams as? LayoutParams?).let {
         it?.height = when (mCurState) {
-          STATE_COLLAPSE -> collapseHeight.toInt().coerceAtMost(expandHeight.toInt())
+          STATE_COLLAPSE -> minOf(collapseHeight.toInt(), expandHeight.toInt())
           STATE_EXPAND -> android.view.ViewGroup.LayoutParams.WRAP_CONTENT
           else -> it?.height
         }
       }
       if (expandHeight <= collapseHeight) {
         this.mTriggerView?.visibility = View.GONE
-        isEnabled = false
       } else if (enableCollapseAfterExpand) {
-        isEnabled = true
         this.mTriggerView?.visibility = View.VISIBLE
       }
     }
     super.onMeasure(widthMeasureSpec, heightMeasureSpec)
   }
 
-  private fun getTargetViewExpandHeight(widthMeasureSpec: Int, heightMeasureSpec: Int): Float {
+  private fun getTargetViewExpandHeight(
+    widthMeasureSpec: Int,
+    heightMeasureSpec: Int,
+    measureText: Boolean = true
+  ): Float {
     val layout = this.mTargetView.layoutParams as LayoutParams
-    layout.height = android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+    layout.height = ViewGroup.LayoutParams.WRAP_CONTENT
     this.mTargetView.layoutParams = layout
     measureChildWithMargins(this.mTargetView, widthMeasureSpec, 0, heightMeasureSpec, 0)
-    return this.mTargetView.measuredHeight.toFloat()
+    val height = this.mTargetView.measuredHeight.toFloat()
+    if (mTargetView is TextView && maxLine > 0 && (mTargetView as TextView).lineCount >= maxLine && measureText) {
+      val textView = mTargetView as TextView
+      textView.maxLines = maxLine
+      collapseHeight = getTargetViewExpandHeight(widthMeasureSpec, heightMeasureSpec, false)
+      textView.maxLines = Integer.MAX_VALUE
+    }
+    return height
   }
 
   private fun ensureTarget() {
