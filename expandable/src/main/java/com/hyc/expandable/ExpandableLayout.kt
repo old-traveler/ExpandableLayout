@@ -223,6 +223,9 @@ class ExpandableLayout @JvmOverloads constructor(
     if (mTargetView is TextView){
       mTargetView.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
     }
+    if (isAnimation){
+      isAnimation = false
+    }
   }
 
   fun addExpandStateChangeListener(listener: OnExpandStateChangeListener?) {
