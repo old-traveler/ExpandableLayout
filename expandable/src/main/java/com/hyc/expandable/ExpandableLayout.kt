@@ -38,12 +38,14 @@ class ExpandableLayout @JvmOverloads constructor(
   private var position: Int = 0
   private var enableCollapseAfterExpand: Boolean = true
   private var maxLine = 0
+  private var expandCount = 0
   var mTriggerId: Int = -1
   private var mCurState: Int by Delegates.observable(STATE_COLLAPSE) { _: KProperty<*>, oldValue: Int, newValue: Int ->
     if (mTriggerView?.visibility == View.VISIBLE && isEnabled) {
       onExpandStateChangeListeners.forEach {
         it?.onExpandStateChange(this, oldValue, newValue)
       }
+      if (newValue == STATE_EXPAND) expandCount++
       saveState(newValue)
       if (hasAnimation) {
         isAnimation = true
@@ -69,9 +71,16 @@ class ExpandableLayout @JvmOverloads constructor(
     }
   }
 
+  public fun recovery(){
+    mTriggerView?.visibility = View.VISIBLE
+    updateStateNow(STATE_COLLAPSE)
+    expandCount = 0
+  }
+
   public fun setEnableCollapseAfterExpand(enable: Boolean) {
     this.enableCollapseAfterExpand = enable
     isEnabled = true
+    expandCount = 0
     this.requestLayout()
   }
 
@@ -128,7 +137,7 @@ class ExpandableLayout @JvmOverloads constructor(
       }
       if (expandHeight <= collapseHeight) {
         this.mTriggerView?.visibility = View.GONE
-      } else if (enableCollapseAfterExpand) {
+      } else if(enableCollapseAfterExpand || expandCount == 0) {
         this.mTriggerView?.visibility = View.VISIBLE
       }
     }
