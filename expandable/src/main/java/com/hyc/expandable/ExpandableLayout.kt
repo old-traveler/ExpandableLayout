@@ -61,8 +61,8 @@ class ExpandableLayout @JvmOverloads constructor(
   private val onExpandAnimationChangeListeners = mutableListOf<OnExpandAnimationChangeListener?>()
 
   companion object {
-    const val STATE_COLLAPSE = 1
-    const val STATE_EXPAND = 2
+    const val STATE_COLLAPSE = 0
+    const val STATE_EXPAND = -1
   }
 
   public fun setExpandState(state: Int) {
