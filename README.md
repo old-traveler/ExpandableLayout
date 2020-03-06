@@ -20,10 +20,10 @@
     <attr name="icon" format="reference" /> //触发折叠图标
     <attr name="expandText" format="string" />  //展开时显示的文本
     <attr name="collapseText" format="string" /> //折叠时显示的文本
-    <attr name="iconColor" format="color" />  
-    <attr name="iconSize" format="dimension" />
+    <attr name="iconColor" format="color" />  //给icon设置颜色
+    <attr name="iconSize" format="dimension" /> //设置icon的边长
     <attr name="enableBaseLine" format="boolean" /> //是否与折叠内容底部对齐
-    <attr name="textStyle">
+    <attr name="textStyle">  //提示文字的字体样式
       <flag name="normal" value="0" />
       <flag name="bold" value="1" />
       <flag name="italic" value="2" />
